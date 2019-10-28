@@ -8,3 +8,5 @@ fixtures:
     puppet_agent: 'git://github.com/puppetlabs/puppetlabs-puppet_agent.git'
     provision: 'git://github.com/puppetlabs/provision.git'
   forge_modules:
+    augeasproviders_core: "herculesteam/augeasproviders_core"
+    augeasproviders_sysctl: "herculesteam/augeasproviders_sysctl"
