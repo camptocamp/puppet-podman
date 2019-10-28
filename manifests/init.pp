@@ -5,4 +5,5 @@
 # @example
 #   include podman
 class podman {
+  class { '::podman::install': }
 }
