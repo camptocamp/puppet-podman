@@ -1,0 +1,22 @@
+[Unit]
+Description=<%= $description %>
+
+[Service]
+Restart=always
+ExecStartPre=-/usr/bin/podman pull <%= $image %>
+ExecStartPre=-/usr/bin/bash -c "(/usr/bin/podman ps --format '{{.Names}}' | /usr/bin/grep -Eq '^<%= $sanitised_title %>$') && /usr/bin/podman kill <%= $sanitised_title %> || /bin/true"
+ExecStartPre=-/usr/bin/bash -c "((/usr/bin/podman ps -a --format '{{.Names}}' | /usr/bin/grep -Eq '^<%= $sanitised_title %>$') && /usr/bin/podman rm <%= $sanitised_title %> || /bin/true)"
+ExecStart=/usr/bin/podman run \
+<% $ports.each |$port| { -%>
+  --publish <%= $port %> \
+<% } -%>
+  <%= $container_run_flags %> \
+  --name <%= $sanitised_title %> \
+  <%= $image %> \
+  <% if $command { %> <%= $command %><% } %>
+ExecStop=-/usr/bin/podman stop -t 10 <%= $sanitised_title %>
+ExecReload=-/usr/bin/podman stop -t 10 <%= $sanitised_title %>
+ExecReload=-/usr/bin/podman rm <%= $sanitised_title %>
+
+[Install]
+WantedBy=multi-user.target
