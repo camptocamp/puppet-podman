@@ -6,4 +6,5 @@
 #   include podman
 class podman {
   class { '::podman::install': }
+  -> class { '::podman::config': }
 }
