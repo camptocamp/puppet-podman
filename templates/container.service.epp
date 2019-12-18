@@ -3,6 +3,8 @@ Description=<%= $description %>
 
 [Service]
 Restart=always
+User=<%= $user %>
+Group=<%= $group %>
 ExecStartPre=-/usr/bin/podman pull <%= $image %>
 ExecStartPre=-/usr/bin/bash -c "(/usr/bin/podman ps --format '{{.Names}}' | /usr/bin/grep -Eq '^<%= $sanitised_title %>$') && /usr/bin/podman kill <%= $sanitised_title %> || /bin/true"
 ExecStartPre=-/usr/bin/bash -c "((/usr/bin/podman ps -a --format '{{.Names}}' | /usr/bin/grep -Eq '^<%= $sanitised_title %>$') && /usr/bin/podman rm <%= $sanitised_title %> || /bin/true)"

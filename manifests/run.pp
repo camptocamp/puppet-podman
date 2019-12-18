@@ -6,6 +6,8 @@
 #   podman::run { 'namevar': }
 define podman::run (
   String[1]        $image,
+  Optional[String] $user                = 'root',
+  Optional[String] $group               = 'root',
   Optional[String] $command             = undef,
   Optional[String] $container_run_flags = undef,
   Array            $ports               = [],
@@ -17,6 +19,8 @@ define podman::run (
       {
         'description'         => sprintf('%s container', capitalize($name)),
         'image'               => $image,
+        'user'                => $user,
+        'group'               => $group,
         'sanitised_title'     => regsubst($title, '[^0-9A-Za-z.\-_]', '-', 'G'),
         'ports'               => [],
         'command'             => $command,
