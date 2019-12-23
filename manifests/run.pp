@@ -22,7 +22,7 @@ define podman::run (
         'user'                => $user,
         'group'               => $group,
         'sanitised_title'     => regsubst($title, '[^0-9A-Za-z.\-_]', '-', 'G'),
-        'ports'               => [],
+        'ports'               => $ports,
         'command'             => $command,
         'container_run_flags' => $container_run_flags,
       }
