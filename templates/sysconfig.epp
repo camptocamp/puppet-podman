@@ -1,0 +1,40 @@
+<%- |
+  Optional[String] $image = '',
+  Optional[String] $container_tag = 'latest',
+  Optional[String] $podman_extra_args = undef,
+  Optional[String] $container_extra_flags = undef,
+  Optional[Array] $ports = [],
+  Optional[Array] $volumes = [],
+
+| -%>
+IMAGE=<%= $image %>
+TAG=<%= $container_tag %>
+
+#ENV_VARS="-e DATABASE_HOST=192.168.1.1."
+#PODMAN_EXTRA_ARGS="--memory 512m"
+#PUBLISH_PORTS="-p HOST_PORT:CONTAINER_PORT"
+#VOLUMES="-v HOST_PATH:CONTAINER_PORT[:options]"
+#CONTAINER_EXTRA_FLAGS=
+
+<% if $podman_extra_args != undef { -%>
+PODMAN_EXTRA_ARGS="<%= $podman_extra_args %>"
+<% } -%>
+<% if $container_extra_flags != undef { -%>
+CONTAINER_EXTRA_FLAGS="<%= $container_extra_flags %>"
+<% } -%>
+
+<% if $volumes != undef { 
+
+$volumes_list = $volumes.map |$volume| {
+  $option = $volume[option] ? {
+    undef   => '',
+    default => ":${volume[option]}"
+  }
+  "-v ${volume[host]}:${volume[container]}${option}"
+}.join(' ')
+
+-%>
+VOLUMES="<%= $volumes_list %>"
+<% } -%>
+
+
