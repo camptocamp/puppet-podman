@@ -20,7 +20,6 @@ ExecStart=/usr/bin/podman run \
   --conmon-pidfile=/%T/%n-pid \
   --cidfile=/%T/%n-cid \
   --name %N \
-  --rm \
   --detach \
   $VOLUMES \
   $PUBLISH_PORTS \
