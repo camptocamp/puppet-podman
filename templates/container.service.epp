@@ -1,24 +1,37 @@
+<%- |
+  String $environment_file,
+  String $sanitised_title,
+  String $description
+| -%>
 [Unit]
 Description=<%= $description %>
 
 [Service]
-Restart=always
-User=<%= $user %>
-Group=<%= $group %>
-ExecStartPre=-/usr/bin/podman pull <%= $image %>
-ExecStartPre=-/usr/bin/bash -c "(/usr/bin/podman ps --format '{{.Names}}' | /usr/bin/grep -Eq '^<%= $sanitised_title %>$') && /usr/bin/podman kill <%= $sanitised_title %> || /bin/true"
+Restart=on-failure
+Type=forking
+TimeoutStartSec=5m
+EnvironmentFile=<%= $environment_file %>
+
+
 ExecStartPre=-/usr/bin/bash -c "((/usr/bin/podman ps -a --format '{{.Names}}' | /usr/bin/grep -Eq '^<%= $sanitised_title %>$') && /usr/bin/podman rm <%= $sanitised_title %> || /bin/true)"
+ExecStartPre=/usr/bin/rm -f /%T/%n-pid /%T/%n-cid
+
 ExecStart=/usr/bin/podman run \
-<% $ports.each |$port| { -%>
-  --publish <%= $port %> \
-<% } -%>
-  <%= $container_run_flags %> \
-  --name <%= $sanitised_title %> \
-  <%= $image %> \
-  <% if $command { %> <%= $command %><% } %>
-ExecStop=-/usr/bin/podman stop -t 10 <%= $sanitised_title %>
-ExecReload=-/usr/bin/podman stop -t 10 <%= $sanitised_title %>
-ExecReload=-/usr/bin/podman rm <%= $sanitised_title %>
+  --conmon-pidfile=/%T/%n-pid \
+  --cidfile=/%T/%n-cid \
+  --name %N \
+  --detach \
+  $VOLUMES \
+  $PUBLISH_PORTS \
+  $ENV_VARS \
+  $PODMAN_EXTRA_ARGS \
+  ${IMAGE}:${TAG} $CONTAINER_EXTRA_FLAGS
+
+ExecStop=/usr/bin/sh -c "/usr/bin/podman rm -f `cat /%T/%n-cid`"
+
+RestartSec=30
+KillMode=none
+PIDFile=/%T/%n-pid
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
