@@ -30,7 +30,7 @@ CONTAINER_EXTRA_FLAGS="<%= $container_extra_flags %>"
     "-e ${e}"
   }.join(' ')
 -%>
-ENV_VARS="<%= $env_vars_list %>"
+ENV_VARS="<%= $env_vars_list -%>"
 <% } -%>
 
 <% if $ports != undef { 
@@ -38,7 +38,7 @@ ENV_VARS="<%= $env_vars_list %>"
     "-p ${p[host]}:${p[guest]}"
   }.join(' ')
 -%>
-PUBLISH_PORTS="<%= $ports_list %>"
+PUBLISH_PORTS="<%= $ports_list -%>"
 <% } -%>
 
 <% if $volumes != undef { 
@@ -50,7 +50,7 @@ $volumes_list = $volumes.map |$volume| {
   "-v ${volume[host]}:${volume[container]}${option}"
 }.join(' ')
 -%>
-VOLUMES="<%= $volumes_list %>"
+VOLUMES="<%= $volumes_list -%>"
 <% } -%>
 
 
