@@ -13,7 +13,7 @@ TimeoutStartSec=5m
 EnvironmentFile=<%= $environment_file %>
 
 
-ExecStartPre=-/usr/bin/bash -c "((/usr/bin/podman ps -a --format '{{.Names}}' | /usr/bin/grep -Eq '^<%= $sanitised_title %>$') && /usr/bin/podman rm <%= $sanitised_title %> || /bin/true)"
+ExecStartPre=-/usr/bin/bash -c "((/usr/bin/podman ps -a --format '{{.Names}}' | /usr/bin/grep -Eq '^<%= $sanitised_title %>-container$') && /usr/bin/podman rm <%= $sanitised_title %>-container || /bin/true)"
 ExecStartPre=/usr/bin/rm -f /%T/%n-pid /%T/%n-cid
 
 ExecStart=/usr/bin/podman run \
