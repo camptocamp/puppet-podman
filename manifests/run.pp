@@ -57,6 +57,7 @@ define podman::run (
         'volumes'               => $volumes,
         'container_extra_flags' => $container_extra_flags,
         'podman_extra_args'     => $podman_extra_args,
+        'ports'                 => $ports
       }
     ),
     replace => $manage_environment_file,

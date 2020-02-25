@@ -3,9 +3,9 @@
   Optional[String] $container_tag = 'latest',
   Optional[String] $podman_extra_args = undef,
   Optional[String] $container_extra_flags = undef,
-  Optional[Array]  $ports = [],
-  Optional[Array]  $volumes = [],
-  Optional[Array]  $env_vars = [],
+  Optional[Array]  $ports = undef,
+  Optional[Array]  $volumes = undef,
+  Optional[Array]  $env_vars = undef,
 | -%>
 
 IMAGE=<%= $image %>
