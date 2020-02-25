@@ -5,17 +5,18 @@
 # @example
 #   podman::run { 'namevar': }
 define podman::run (
-  Optional[String] $image                 = undef,
-  String[1]        $container_tag         = 'latest',
-  String[1]        $user                  = 'root',
-  String[1]        $group                 = 'root',
-  Optional[String] $command               = undef,
-  String           $environment_file      = "/etc/sysconfig/${name}",
+  Optional[String] $image                   = undef,
+  String[1]        $container_tag           = 'latest',
+  String[1]        $user                    = 'root',
+  String[1]        $group                   = 'root',
+  Optional[String] $command                 = undef,
+  String           $environment_file        = "/etc/sysconfig/${name}",
   Boolean          $manage_environment_file = true,
-  Array            $ports                 = [],
-  Array            $volumes               = [],
-  Optional[String] $container_extra_flags = undef,
-  Optional[String] $podman_extra_args    = undef,
+  Array            $ports                   = [],
+  Array            $volumes                 = [],
+  Optional[Array]  $env_vars                = undef,
+  Optional[String] $container_extra_flags   = undef,
+  Optional[String] $podman_extra_args       = undef,
 ) {
   include ::podman
 
@@ -57,7 +58,8 @@ define podman::run (
         'volumes'               => $volumes,
         'container_extra_flags' => $container_extra_flags,
         'podman_extra_args'     => $podman_extra_args,
-        'ports'                 => $ports
+        'ports'                 => $ports,
+        'env_vars'              => $env_vars,
       }
     ),
     replace => $manage_environment_file,
