@@ -3,18 +3,20 @@
   Optional[String] $container_tag = 'latest',
   Optional[String] $podman_extra_args = undef,
   Optional[String] $container_extra_flags = undef,
-  Optional[Array] $ports = [],
-  Optional[Array] $volumes = [],
-
+  Optional[Array]  $ports = [],
+  Optional[Array]  $volumes = [],
+  Optional[Array]  $env_vars = [],
 | -%>
+
 IMAGE=<%= $image %>
 TAG=<%= $container_tag %>
 
 #ENV_VARS="-e DATABASE_HOST=192.168.1.1."
 #PODMAN_EXTRA_ARGS="--memory 512m"
-#PUBLISH_PORTS="-p HOST_PORT:CONTAINER_PORT"
 #VOLUMES="-v HOST_PATH:CONTAINER_PORT[:options]"
+#PUBLISH_PORTS="-p HOST_PORT:CONTAINER_PORT"
 #CONTAINER_EXTRA_FLAGS=
+#CONTAINER_ARGS="-e FOO=BAR"
 
 <% if $podman_extra_args != undef { -%>
 PODMAN_EXTRA_ARGS="<%= $podman_extra_args %>"
@@ -23,8 +25,23 @@ PODMAN_EXTRA_ARGS="<%= $podman_extra_args %>"
 CONTAINER_EXTRA_FLAGS="<%= $container_extra_flags %>"
 <% } -%>
 
-<% if $volumes != undef { 
+<% if $env_vars != undef { 
+  $env_vars_list = $env_vars.map |$e| {
+    "-e ${e}"
+  }.join(' ')
+-%>
+ENV_VARS="<%= $env_vars_list %>"
+<% } -%>
 
+<% if $ports != undef { 
+  $ports_list = $ports.map |$p| {
+    "-p ${p[host]}:${p[guest]}"
+  }.join(' ')
+-%>
+PUBLISH_PORTS="<%= $ports_list %>"
+<% } -%>
+
+<% if $volumes != undef { 
 $volumes_list = $volumes.map |$volume| {
   $option = $volume[option] ? {
     undef   => '',
@@ -32,7 +49,6 @@ $volumes_list = $volumes.map |$volume| {
   }
   "-v ${volume[host]}:${volume[container]}${option}"
 }.join(' ')
-
 -%>
 VOLUMES="<%= $volumes_list %>"
 <% } -%>
