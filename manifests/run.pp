@@ -17,6 +17,7 @@ define podman::run (
   Optional[Array]  $env_vars                = undef,
   Optional[String] $container_extra_flags   = undef,
   Optional[String] $podman_extra_args       = undef,
+  Optional[String] $depends_on_svc          = undef,
 ) {
   include ::podman
 
@@ -38,6 +39,7 @@ define podman::run (
         'description'      => sprintf('%s container', capitalize($name)),
         'sanitised_title'  => regsubst($title, '[^0-9A-Za-z.\-_]', '-', 'G'),
         'environment_file' => $environment_file,
+        'depends_on_svc'   => $depends_on_svc,
       }
     ),
     owner   => $user,

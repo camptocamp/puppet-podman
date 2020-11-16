@@ -1,10 +1,14 @@
 <%- |
   String $environment_file,
   String $sanitised_title,
-  String $description
+  String $description,
+  Optional[String] $depends_on_svc = undef,
 | -%>
 [Unit]
 Description=<%= $description %>
+<% if $depends_on_svc != undef { -%>
+AFTER="<%= $depends_on_svc %>"
+<% } -%>
 
 [Service]
 Restart=on-failure
