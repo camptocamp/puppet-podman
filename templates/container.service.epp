@@ -6,6 +6,8 @@
 | -%>
 [Unit]
 Description=<%= $description %>
+Wants=network.target
+After=network-online.target
 <% if $depends_on_svc != undef { -%>
 After=<%= $depends_on_svc %>
 Requires=<%= $depends_on_svc %>
@@ -18,12 +20,13 @@ TimeoutStartSec=5m
 EnvironmentFile=<%= $environment_file %>
 
 
-ExecStartPre=-/usr/bin/bash -c "((/usr/bin/podman ps -a --format '{{.Names}}' | /usr/bin/grep -Eq '^<%= $sanitised_title %>-container$') && /usr/bin/podman rm <%= $sanitised_title %>-container || /bin/true)"
-ExecStartPre=/usr/bin/rm -f /%T/%n-pid /%T/%n-cid
+ExecStartPre=/bin/rm -f %t/%N.pid %t/%N.ctr-id
 
 ExecStart=/usr/bin/podman run \
-  --conmon-pidfile=/%T/%n-pid \
-  --cidfile=/%T/%n-cid \
+  --conmon-pidfile=%t/%N.pid \
+  --cidfile=%t/%N.ctr-id \
+  --cgroups=no-conmon \
+  --replace \
   --name %N \
   --detach \
   $VOLUMES \
@@ -32,11 +35,12 @@ ExecStart=/usr/bin/podman run \
   $PODMAN_EXTRA_ARGS \
   ${IMAGE}:${TAG} $CONTAINER_EXTRA_FLAGS
 
-ExecStop=/usr/bin/sh -c "/usr/bin/podman rm -f `cat /%T/%n-cid`"
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/%N.ctr-id -t 10
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/%N.ctr-id
 
 RestartSec=30
 KillMode=none
-PIDFile=/%T/%n-pid
+PIDFile=%t/%N.pid
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target default.target
