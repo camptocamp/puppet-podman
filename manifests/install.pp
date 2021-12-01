@@ -4,11 +4,13 @@
 #
 # @example
 #   include podman::install
-class podman::install {
+class podman::install (
+  String $podman_version = 'present',
+  ) {
   package { 'slirp4netns':
     ensure => present,
   }
   package { 'podman':
-    ensure => present,
+    ensure => $podman_version,
   }
 }
